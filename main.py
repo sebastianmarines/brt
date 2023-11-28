@@ -7,6 +7,13 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
+import random
+from mesa import Agent, Model
+from mesa.time import RandomActivation
+
+from pydantic import BaseModel
+
+
 class Estacion(BaseModel):
     nombre: str
     posicion: tuple[int, int]
@@ -69,11 +76,11 @@ class Bus(Model):
         for station in self.stations:
             self.schedule.add(station)
 
-        self.charging_rate = 20  # Amount of battery the bus charges per step at the charging station
+        self.charging_rate = 60  # Amount of battery the bus charges per step at the charging station
 
     def discharge_battery(self, distance):
         # Discharge rate can be defined as per unit of distance
-        discharge_rate = 1  # Assuming 1 unit of battery for 1 unit of distance
+        discharge_rate = 0.1  # Assuming 1 unit of battery for 1 unit of distance
         self.battery -= distance * discharge_rate
 
     def step(self):
@@ -103,10 +110,11 @@ class Bus(Model):
         distance_to_next_station = abs(next_station.x_coordinate - current_station.x_coordinate)
 
         # Print the current state
-        # print(f"Step {self.schedule.steps}:")
-        # print(f"  Bus at {current_station}{charging_status}-({current_station.x_coordinate}), Passengers on bus: {self.passengers}, Battery: {self.battery}/{self.battery_capacity}")
-        # for station in self.stations:
-        #     print(f"  {station}: People waiting: {station.people_waiting}")
+        print(f"Step {self.schedule.steps}:")
+        print(
+            f"  Bus at {current_station}{charging_status}-({current_station.x_coordinate}), Passengers on bus: {self.passengers}, Battery: {self.battery}/{self.battery_capacity}")
+        for station in self.stations:
+            print(f"  {station}: People waiting: {station.people_waiting}")
 
         self.data.resultados_por_estacion.append(
             ResultadoEstacion(
